@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voltek Power Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* White background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #006400; /* Dark green color */
+        }
+
+        .data-container {
+            background-color: #f0fff0; /* Light green background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .data-item {
+            margin: 10px 0;
+        }
+
+        .data-item span {
+            font-weight: bold;
+            color: #006400; /* Dark green color */
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #006400; /* Dark green color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #004d00; /* Darker green color */
+        }
+    </style>
+</head>
+<body>
+    <h1>Voltek Power Manager</h1>
+    <div class="data-container">
+        <div class="data-item">Current Measurement 4: <span id="C4">N/A</span> A</div>
+        <div class="data-item">Current Measurement 5: <span id="C5">N/A</span> A</div>
+        <div class="data-item">Current Measurement 6: <span id="C6">N/A</span> A</div>
+        <div class="data-item">Fault Status 4: <span id="F4">N/A</span></div>
+        <div class="data-item">Fault Status 5: <span id="F5">N/A</span></div>
+        <div class="data-item">Fault Status 6: <span id="F6">N/A</span></div>
+        <div class="data-item">Current Measurement 1: <span id="C1">N/A</span> A</div>
+        <div class="data-item">Current Measurement 2: <span id="C2">N/A</span> A</div>
+        <div class="data-item">Current Measurement 3: <span id="C3">N/A</span> A</div>
+        <div class="data-item">Fault Status 1: <span id="F1">N/A</span></div>
+        <div class="data-item">Fault Status 2: <span id="F2">N/A</span></div>
+        <div class="data-item">Fault Status 3: <span id="F3">N/A</span></div>
+    </div>
+    <div class="button-container">
+        <button class="button" onclick="fetchData()">Connect Device</button>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                // Fetch data from U7
+                const responseU7 = await fetch('http://<ESP32_IP_ADDRESS>/data_u7'); // Replace <ESP32_IP_ADDRESS> with the actual IP address of your ESP32
+                const dataU7 = await responseU7.json();
+
+                document.getElementById('C4').textContent = dataU7["Current Reading line 4"];
+                document.getElementById('C5').textContent = dataU7["Current Reading line 5"];
+                document.getElementById('C6').textContent = dataU7["Current Reading line 6"];
+                document.getElementById('F4').textContent = dataU7["Fault line 4"] ? 'Fault' : 'OK';
+                document.getElementById('F5').textContent = dataU7["Fault line 5"] ? 'Fault' : 'OK';
+                document.getElementById('F6').textContent = dataU7["Fault line 6"] ? 'Fault' : 'OK';
+
+                // Fetch data from U10
+                const responseU10 = await fetch('http://<ESP32_IP_ADDRESS>/data_u10'); // Replace <ESP32_IP_ADDRESS> with the actual IP address of your ESP32
+                const dataU10 = await responseU10.json();
+
+                document.getElementById('C1').textContent = dataU10["Current Reading line 1"];
+                document.getElementById('C2').textContent = dataU10["Current Reading line 2"];
+                document.getElementById('C3').textContent = dataU10["Current Reading line 3"];
+                document.getElementById('F1').textContent = dataU10["Fault line 1"] ? 'Fault' : 'OK';
+                document.getElementById('F2').textContent = dataU10["Fault line 2"] ? 'Fault' : 'OK';
+                document.getElementById('F3').textContent = dataU10["Fault line 3"] ? 'Fault' : 'OK';
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        setInterval(fetchData, 10000); // Fetch data every 10 seconds
+        fetchData(); // Initial fetch
+    </script>
+</body>
+</html>
